@@ -5,7 +5,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 
 add_executable(swm src/main.cpp)
 
-find_package(XCB REQUIRED)
+find_package(xcb REQUIRED)
 find_package(toml11 REQUIRED)
 
 # Link headers and source files.
