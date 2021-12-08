@@ -32,8 +32,8 @@ int main() {
     xcb_map_window(connection, window);
     xcb_flush(connection);
     
-    std::cout << "Press any key to resume";
-    int x = std::cin.get();
+    std::cout << "Press enter to resume ";
+    std::cin.get();
 
     xcb_disconnect(connection);
 
