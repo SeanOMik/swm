@@ -13,6 +13,6 @@ public:
     Config(const std::string& config_path) {
         toml::value toml = toml::parse(config_path);
 
-        programs = ProgramsConfig(toml["programs"]);
+        programs = ProgramsConfig(toml["Programs"]);
     }
 };
