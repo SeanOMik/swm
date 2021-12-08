@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
 
+#include <xcb/xcb.h>
+#include <xcb/xproto.h>
+
 #include "config/config.h"
 
 #include "xdg.hpp"
@@ -15,7 +18,24 @@ int main() {
     Config config(path);
 #endif
 
-    std::cout << "Terminal: \"" << config.programs.terminal << "\" - Launcher: \"" << config.programs.launcher << "\"" << std::endl;
+    // opens connection to display server (xorg)
+    xcb_connection_t* connection = xcb_connect(NULL, NULL);
+
+    // grab first screen
+    const xcb_setup_t* setup = xcb_get_setup(connection);
+    xcb_screen_iterator_t iter = xcb_setup_roots_iterator(setup);
+    xcb_screen_t* screen = iter.data;
+
+    // create basic window
+    xcb_window_t window = xcb_generate_id(connection);
+    xcb_create_window(connection, XCB_COPY_FROM_PARENT, window, screen->root, 0, 0, 150, 150, 10, XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual, 0, NULL);
+    xcb_map_window(connection, window);
+    xcb_flush(connection);
+    
+    std::cout << "Press any key to resume";
+    int x = std::cin.get();
+
+    xcb_disconnect(connection);
 
     return 0;
 }
