@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -10,14 +11,16 @@
 
 #include "xdg.hpp"
 
+void autostart(Config conf);
+
 int main() {
 
 #ifndef __DEBUG__
-    Config config("config.toml");
+    Config config(std::filesystem::canonical("./"));
 #else
     std::string path = xdg::ConfigHomeDir();
-    path += "/swm/config.toml";
-    Config config(path);
+    path += "/swm/";
+    Config config(std::filesystem::canonical(path));
 #endif
 
     // Check if X is running
@@ -50,4 +53,11 @@ int main() {
     xcb_disconnect(connection);
 
     return 0;
+}
+
+// I stole this from a DWM patch, There has got to be a better way to do this!
+void autostart(Config conf) {
+    // The & daemonizes the shell script, we need this unless we want to be blocked from starting
+    std::string autostart_command = "cd " + conf.path + "; sh ./autostart.sh &";
+    system(autostart_command.c_str());
 }

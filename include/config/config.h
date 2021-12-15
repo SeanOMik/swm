@@ -9,10 +9,12 @@
 class Config {
 public:
     ProgramsConfig programs;
+    std::string path;
 
     Config(const std::string& config_path) {
-        toml::value toml = toml::parse(config_path);
+        this->path = config_path; 
 
+        toml::value toml = toml::parse(path + "config.toml");
         programs = ProgramsConfig(toml["Programs"]);
     }
 };
