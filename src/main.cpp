@@ -11,6 +11,8 @@
 
 #include "xdg.hpp"
 
+//int check_x();
+//int check_other_wm();
 void autostart(Config conf);
 
 int main() {
@@ -23,23 +25,32 @@ int main() {
     Config config(std::filesystem::canonical(path));
 #endif
 
-    // Check if X is running
+    // TODO: Turn this into `int check_x()`
     Display* disp = XOpenDisplay(NULL);
     if (!disp) {
         // Can't really start an X window manager without X.
-        std::cerr << "X is not running, please start X first!";
+        std::cerr << "X is not running, please start X first!" << std::endl;
         return 1;
     }
     XCloseDisplay(disp);
     free(disp); // Not sure if X frees this pointer, going to do it anyways until told otherwise.
 
-    // opens connection to display server (xorg)
     xcb_connection_t* connection = xcb_connect(NULL, NULL);
 
     // grab first screen
     const xcb_setup_t* setup = xcb_get_setup(connection);
     xcb_screen_iterator_t iter = xcb_setup_roots_iterator(setup);
     xcb_screen_t* screen = iter.data;
+
+    // TODO: Turn this into `int check_other_wm()`
+    xcb_generic_error_t* error;
+    unsigned int mask[1] = {XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT};
+    error = xcb_request_check(connection, xcb_change_window_attributes_checked(connection, screen->root, XCB_CW_EVENT_MASK, mask));
+    xcb_flush(connection);
+    if (error) {
+        std::cerr << "Another WM is running, please close out of it first!" << std::endl;
+        return 1;
+    }
 
     // create basic window
     xcb_window_t window = xcb_generate_id(connection);
