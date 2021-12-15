@@ -4,6 +4,8 @@
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 
+#include <X11/Xlib.h>
+
 #include "config/config.h"
 
 #include "xdg.hpp"
@@ -17,6 +19,16 @@ int main() {
     path += "/swm/config.toml";
     Config config(path);
 #endif
+
+    // Check if X is running
+    Display* disp = XOpenDisplay(NULL);
+    if (!disp) {
+        // Can't really start an X window manager without X.
+        std::cerr << "X is not running, please start X first!";
+        return 1;
+    }
+    XCloseDisplay(disp);
+    free(disp); // Not sure if X frees this pointer, going to do it anyways until told otherwise.
 
     // opens connection to display server (xorg)
     xcb_connection_t* connection = xcb_connect(NULL, NULL);
